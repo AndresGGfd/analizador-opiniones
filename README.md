@@ -148,7 +148,7 @@ Luego abrir Pull Request en GitHub para revisión.
 
 ## 👥 Equipo
 
-8 integrantes del grupo (a completar)
+andress mi señor
 
 ## 📚 Referencias
 
