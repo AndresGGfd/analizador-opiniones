@@ -13,6 +13,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from collections import Counter
 from wordcloud import WordCloud
+import pyLDAvis
+import pyLDAvis.gensim_models as gensimvis
+import streamlit.components.v1 as components
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -416,6 +419,15 @@ with tab4:
                 st.markdown(f"<div style='text-align:center; color:#1e3a8a; font-weight:700; margin-bottom:5px;'>{nombre.upper()}</div>", unsafe_allow_html=True)
                 st.pyplot(fig_wc)
                 plt.close(fig_wc)
+
+        st.markdown("---")
+        st.markdown("#### Explorador Interactivo de Tópicos (pyLDAvis)")
+        st.markdown("<div class='card-instruction'>Mapa de distancia inter-tópica (PCA). Los círculos representan los tópicos; su tamaño indica la prevalencia y la distancia indica cuán distintos son entre sí. Pasa el ratón sobre ellos o sobre las palabras para ver sus relaciones.</div>", unsafe_allow_html=True)
+        
+        with st.spinner("Renderizando motor de visualización pyLDAvis..."):
+            vis_data = gensimvis.prepare(lda_model, st.session_state.corpus_gensim, st.session_state.dictionary)
+            html_string = pyLDAvis.prepared_data_to_html(vis_data)
+            components.html(html_string, width=1300, height=800, scrolling=True)
 
         # Matriz de volumen por clúster
         dominantes = [t[0] for t in topicos_doc if t[0] is not None]
