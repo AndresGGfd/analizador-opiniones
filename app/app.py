@@ -12,6 +12,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from collections import Counter
+from wordcloud import WordCloud
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -243,7 +244,7 @@ with tab2:
         col_demo, col_result = st.columns([1, 1])
         with col_demo:
             st.markdown("*Texto original en crudo:*")
-            st.text_area(label="", value=texto_orig, disabled=True, label_visibility="collapsed")
+            st.text_area(label="Texto original", value=texto_orig, disabled=True, label_visibility="collapsed")
 
         t1 = limpiar_texto(texto_orig)
         t2 = tokenizar(t1)
@@ -404,14 +405,17 @@ with tab4:
         for i, (nombre, palabras_str) in enumerate(topicos.items()):
             col = cols_topics[i % 3]
             palabras_dict = parsear_topico_palabras(palabras_str)
-            top5 = sorted(palabras_dict.items(), key=lambda x: x[1], reverse=True)[:5]
-            tags = " ".join([f'<span class="tag">{w}</span>' for w, _ in top5])
-            col.markdown(f"""
-            <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:6px; padding:16px; margin:6px 0;">
-                <span style="color:#1e3a8a; font-weight:700; font-size:0.95em; letter-spacing:0.5px;">{nombre.upper()}</span><br><br>
-                {tags}
-            </div>
-            """, unsafe_allow_html=True)
+            
+            # Generar Nube de Palabras
+            wc = WordCloud(width=600, height=350, background_color="white", colormap="Blues", prefer_horizontal=0.8).generate_from_frequencies(palabras_dict)
+            fig_wc, ax_wc = plt.subplots(figsize=(6, 3.5))
+            ax_wc.imshow(wc, interpolation="bilinear")
+            ax_wc.axis("off")
+            
+            with col:
+                st.markdown(f"<div style='text-align:center; color:#1e3a8a; font-weight:700; margin-bottom:5px;'>{nombre.upper()}</div>", unsafe_allow_html=True)
+                st.pyplot(fig_wc)
+                plt.close(fig_wc)
 
         # Matriz de volumen por clúster
         dominantes = [t[0] for t in topicos_doc if t[0] is not None]
